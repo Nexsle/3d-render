@@ -99,6 +99,32 @@ public class DemoViewer {
                     v2.y += getHeight() / 2;
                     v3.x += getWidth() / 2;
                     v3.y += getHeight() / 2;
+
+
+                    //calculate the edge vector of each triangle
+                    //v1=a, v2=b, v3=c
+                    Vertex ab = new Vertex(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+                    Vertex ac = new Vertex(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z);
+
+                    //calculate normal vector (vector that is perpendicular to the plane)
+                    Vertex normalVector = new Vertex(ab.y*ac.z - ab.z*ac.y, 
+                                                    ab.z*ac.x - ab.x*ac.z,
+                                                    ab.x*ac.y - ab.y*ac.x);
+
+                    //calculate length of normal vector
+                    double normalLength = Math.sqrt(normalVector.x * normalVector.x + normalVector.y * normalVector.y + normalVector.z * normalVector.z);
+
+                    //now we normalize the vector aka make the length = 1 for light calculation
+                    normalVector.x /= normalLength;
+                    normalVector.y /= normalLength;
+                    normalVector.z /= normalLength;
+
+                    //now we calculate the cos between the normal vector and the light
+                    //for simplicity we place our light at [0, 0, 1]
+                    //the length of light and our normal vector is both 1 so we can simplify our formula
+                    double cosAngle = Math.abs(normalVector.z);
+                    //get the color of dimly lit triangle
+                    Color shadeColor = getShade(t.color, cosAngle);
                     
 
                     //get a box of the position of the triangle to optimise fill
@@ -128,8 +154,9 @@ public class DemoViewer {
                                 //creating an index to know which pixel we are currently selecting
                                 int zIndex = y * img.getWidth() + x;
 
+                                
                                 if(zBuffer[zIndex] < depth){
-                                img.setRGB(x, y, t.color.getRGB());
+                                img.setRGB(x, y, shadeColor.getRGB());
                                 zBuffer[zIndex] = depth;
                                 }
                             }
@@ -148,5 +175,16 @@ public class DemoViewer {
         
         frame.setSize(400, 400);
         frame.setVisible(true);
+    }
+    //Convert the color shade base on the angle
+    public static Color getShade(Color color, double shade){
+        double redLinear = Math.pow(color.getRed(), 2.4) * shade;
+        double greenLinear = Math.pow(color.getGreen(), 2.4) * shade;
+        double blueLinear = Math.pow(color.getBlue(), 2.4) * shade;
+
+        int red = (int) Math.pow(redLinear, 1/2.4);
+        int green = (int) Math.pow(greenLinear, 1/2.4);
+        int blue = (int) Math.pow(blueLinear, 1/2.4);
+        return new Color(red, green, blue);
     }
 }
