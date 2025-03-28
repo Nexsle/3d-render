@@ -50,7 +50,9 @@ public class DemoViewer {
 
 
                 //call inflate to increase triangle count
-                // tris = inflate(tris);
+                tris = inflate(tris);
+                tris = inflate(tris);
+                tris = inflate(tris);
                 
                 
                 double heading = Math.toRadians(headingSlider.getValue());
@@ -212,7 +214,7 @@ public class DemoViewer {
 
         for(Triangle t : result){
             for(Vertex v : new Vertex[] {t.v1, t.v2, t.v3}){
-                double l = (v.x * v.x + v.y * v.y + v.z * v.z) / Math.sqrt(30000);
+                double l = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z) / Math.sqrt(30000);
                 v.x /= l;
                 v.y /= l;
                 v.z /= l;
