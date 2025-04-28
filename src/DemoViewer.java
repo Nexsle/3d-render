@@ -1,8 +1,8 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
 public class DemoViewer {
     public static void main(String[] args){
         JFrame frame = new JFrame();
@@ -11,25 +11,25 @@ public class DemoViewer {
 
         
         //slider to control  horizontal rotation
-        JSlider headingSlider = new JSlider(0, 360, 180);
+        JSlider headingSlider = new JSlider(0, 720, 360);
         pane.add(headingSlider, BorderLayout.SOUTH);
 
 
-        //slider for virtical rotation
-        JSlider pitchSlider = new JSlider(SwingConstants.VERTICAL, -90, 90, 0);
+        //slider for vertical rotation
+        JSlider pitchSlider = new JSlider(SwingConstants.VERTICAL, -360, 360, 0);
         pane.add(pitchSlider, BorderLayout.EAST);
 
         
 
         //panel to display render result
-        //this is called an anonymous inner class that extends JPanel and overides paintComponent
         JPanel renderPanel = new JPanel(){
+            @Override
             public void paintComponent(Graphics g){
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, getWidth(), getHeight());
 
-                // magic here
+                //adding all the vertices for the triangles
                 List<Triangle> tris = new ArrayList<Triangle>();
                 tris.add(new Triangle(new Vertex(100, 100, 100),
                         new Vertex(-100, -100, 100),
@@ -49,12 +49,12 @@ public class DemoViewer {
                         Color.BLUE));
 
 
-                //call inflate to increase triangle count
+                //call inflate to increase triangle count and subdivide into a sphere
                 tris = inflate(tris);
                 tris = inflate(tris);
                 tris = inflate(tris);
                 
-                
+                //the matrix we are going to use to calculate the rotation of the 3d object
                 double heading = Math.toRadians(headingSlider.getValue());
                 Matrix3D transformXZ = new Matrix3D(new double[]{
                     Math.cos(heading), 0, -Math.sin(heading),
@@ -69,19 +69,6 @@ public class DemoViewer {
                 });
                 
                 Matrix3D transformBoth = transformXZ.multiply(transformYZ);
-                // g2.translate(getWidth()/2, getHeight()/2);
-                // g2.setColor(Color.WHITE);
-                // for(Triangle t : tris){
-                //     Vertex v1 = transformBoth.transform(t.v1);
-                //     Vertex v2 = transformBoth.transform(t.v2);
-                //     Vertex v3 = transformBoth.transform(t.v3);
-                //     Path2D path = new Path2D.Double();
-                //     path.moveTo(v1.x, v1.y);
-                //     path.lineTo(v3.x, v3.y);
-                //     path.lineTo(v2.x, v2.y);
-                //     path.closePath();
-                //     g2.draw(path);
-                //}
                 BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 
                 //setting up a z buffer value for each pixel in the window
@@ -162,6 +149,7 @@ public class DemoViewer {
                                 int zIndex = y * img.getWidth() + x;
 
                                 
+                                //if the z coord is infront then we draw the pixel
                                 if(zBuffer[zIndex] < depth){
                                 img.setRGB(x, y, shadeColor.getRGB());
                                 zBuffer[zIndex] = depth;

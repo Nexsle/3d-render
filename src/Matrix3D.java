@@ -1,5 +1,5 @@
 public class Matrix3D {
-    private double[] values;
+    private final double[] values;
     public Matrix3D(double[] values){
         this.values = values;
     }
