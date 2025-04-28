@@ -1,6 +1,6 @@
 # 3D Renderer
 A Java-based 3D rendering engine that implements basic 3D graphics techniques to render and manipulate a 3D object in real-time.
-![3D Renderer Demo](./assets/demo.gif)
+![3D Renderer Demo](./assets/showcase.gif)
 
 ## Requirements
 
